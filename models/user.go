@@ -11,7 +11,7 @@ type User struct {
 
 type Profile struct {
 	gorm.Model
-	UserID  uint
+	UserID  uint `gorm:"uniqueIndex"`
 	Phone   string
 	Address string
 	User    *User // Defining inverse relationship with User
