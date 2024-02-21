@@ -21,6 +21,7 @@ func main() {
 	r := gin.Default()
 	r.GET("/", homePage)
 	r.POST("/user/create", controllers.CreateUser)
+	r.POST("/user/:id/profile/create", controllers.CreateProfile)
 
 	r.Run("localhost:3000")
 }
