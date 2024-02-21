@@ -4,13 +4,15 @@ import "gorm.io/gorm"
 
 type User struct {
 	gorm.Model
-	Username string
-	Profile  Profile
+	FirstName string
+	LastName  string
+	Profile   *Profile
 }
 
 type Profile struct {
 	gorm.Model
-	FirstName string
-	LastName  string
-	UserID    uint
+	UserID  uint
+	Phone   string
+	Address string
+	User    *User // Defining inverse relationship with User
 }

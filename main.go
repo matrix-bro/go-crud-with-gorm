@@ -1,6 +1,7 @@
 package main
 
 import (
+	"example/go-crud/controllers"
 	"example/go-crud/initializers"
 	"net/http"
 
@@ -19,6 +20,7 @@ func homePage(c *gin.Context) {
 func main() {
 	r := gin.Default()
 	r.GET("/", homePage)
+	r.POST("/user/create", controllers.CreateUser)
 
 	r.Run("localhost:3000")
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"example/go-crud/initializers"
 	"example/go-crud/models"
+	"fmt"
 )
 
 func init() {
@@ -11,5 +12,11 @@ func init() {
 }
 
 func main() {
-	initializers.DB.AutoMigrate(&models.User{}, &models.Profile{})
+	err := initializers.DB.AutoMigrate(&models.User{}, &models.Profile{})
+
+	if err != nil {
+		panic("Failed to perform migrations: " + err.Error())
+	}
+
+	fmt.Println("Migration Success")
 }
