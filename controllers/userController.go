@@ -92,3 +92,17 @@ func UserProfile(c *gin.Context) {
 
 	c.IndentedJSON(200, gin.H{"data": userprofiles})
 }
+
+func GetUserById(c *gin.Context) {
+	userId := c.Param("id")
+	var response serializers.UserResponse
+
+	result := initializers.DB.First(&models.User{}, userId).Scan(&response)
+
+	if result.Error != nil {
+		c.IndentedJSON(200, gin.H{"data": "No Data"})
+		return
+	}
+
+	c.IndentedJSON(200, gin.H{"data": response})
+}
