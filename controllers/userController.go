@@ -3,6 +3,7 @@ package controllers
 import (
 	"example/go-crud/initializers"
 	"example/go-crud/models"
+	"example/go-crud/serializers"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -61,4 +62,18 @@ func CreateProfile(c *gin.Context) {
 	}
 
 	c.IndentedJSON(200, gin.H{"message": user_profile})
+}
+
+func AllUsers(c *gin.Context) {
+	var users []models.User
+	var response []serializers.UserResponse
+
+	result := initializers.DB.Find(&users).Scan(&response)
+
+	if result.Error != nil {
+		c.Status(400)
+		return
+	}
+
+	c.IndentedJSON(200, gin.H{"data": response})
 }
