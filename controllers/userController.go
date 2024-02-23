@@ -77,3 +77,18 @@ func AllUsers(c *gin.Context) {
 
 	c.IndentedJSON(200, gin.H{"data": response})
 }
+
+func UserProfile(c *gin.Context) {
+	var userprofiles []serializers.UserProfileResponse
+
+	result := initializers.DB.Model(&models.User{}).Select("first_name, last_name, phone, address").
+		Joins("LEFT JOIN profiles on profiles.user_id=users.id").
+		Scan(&userprofiles)
+
+	if result.Error != nil {
+		c.Status(400)
+		return
+	}
+
+	c.IndentedJSON(200, gin.H{"data": userprofiles})
+}

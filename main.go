@@ -23,6 +23,7 @@ func main() {
 	r.POST("/user/create", controllers.CreateUser)
 	r.POST("/user/:id/profile/create", controllers.CreateProfile)
 	r.GET("/user/all", controllers.AllUsers)
+	r.GET("/user/profile", controllers.UserProfile)
 
 	r.Run("localhost:3000")
 }
