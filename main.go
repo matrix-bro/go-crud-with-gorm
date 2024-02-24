@@ -26,5 +26,8 @@ func main() {
 	r.GET("/user/profile", controllers.UserProfile)
 	r.GET("/user/:id", controllers.GetUserDetails)
 
+	// author
+	r.POST("/author", controllers.CreateAuthor)
+
 	r.Run("localhost:3000")
 }
