@@ -12,7 +12,7 @@ func init() {
 }
 
 func main() {
-	err := initializers.DB.AutoMigrate(&models.User{}, &models.Profile{})
+	err := initializers.DB.AutoMigrate(&models.User{}, &models.Profile{}, &models.Author{}, &models.Book{})
 
 	if err != nil {
 		panic("Failed to perform migrations: " + err.Error())

@@ -2,6 +2,8 @@ package models
 
 import "gorm.io/gorm"
 
+// One to One Relationship
+
 type User struct {
 	gorm.Model
 	FirstName string
