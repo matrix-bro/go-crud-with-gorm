@@ -93,16 +93,21 @@ func UserProfile(c *gin.Context) {
 	c.IndentedJSON(200, gin.H{"data": userprofiles})
 }
 
-func GetUserById(c *gin.Context) {
+func GetUserDetails(c *gin.Context) {
 	userId := c.Param("id")
-	var response serializers.UserResponse
+	var userProfile serializers.UserProfileResponse
 
-	result := initializers.DB.First(&models.User{}, userId).Scan(&response)
+	checkUser := initializers.DB.First(&models.User{}, userId)
 
-	if result.Error != nil {
-		c.IndentedJSON(200, gin.H{"data": "No Data"})
+	if checkUser.Error != nil {
+		c.IndentedJSON(200, gin.H{"data": "User not found"})
 		return
 	}
 
-	c.IndentedJSON(200, gin.H{"data": response})
+	initializers.DB.Model(&models.User{}).
+		Joins("LEFT JOIN profiles on users.id = profiles.user_id").
+		Select("first_name, last_name, phone, address").
+		Where("users.id = ?", userId).Scan(&userProfile)
+
+	c.IndentedJSON(200, gin.H{"data": userProfile})
 }

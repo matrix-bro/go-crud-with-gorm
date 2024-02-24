@@ -24,7 +24,7 @@ func main() {
 	r.POST("/user/:id/profile/create", controllers.CreateProfile)
 	r.GET("/user/all", controllers.AllUsers)
 	r.GET("/user/profile", controllers.UserProfile)
-	r.GET("/user/:id", controllers.GetUserById)
+	r.GET("/user/:id", controllers.GetUserDetails)
 
 	r.Run("localhost:3000")
 }
