@@ -28,6 +28,7 @@ func main() {
 
 	// author
 	r.POST("/author", controllers.CreateAuthor)
+	r.POST("/book/:id", controllers.CreateBook)
 
 	r.Run("localhost:3000")
 }

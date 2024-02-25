@@ -4,6 +4,7 @@ import (
 	"example/go-crud/initializers"
 	"example/go-crud/models"
 	"example/go-crud/serializers"
+	"example/go-crud/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -26,4 +27,38 @@ func CreateAuthor(c *gin.Context) {
 	}
 
 	c.IndentedJSON(201, gin.H{"data": authorSerializer, "message": "Created new author successfully."})
+}
+
+func CreateBook(c *gin.Context) {
+	authorId, err := utils.ConvertStringToUint(c.Param("id"))
+
+	if err != "" {
+		c.IndentedJSON(200, gin.H{"error": err})
+		return
+	}
+
+	checkAuthor := initializers.DB.First(&models.Author{}, authorId)
+
+	if checkAuthor.Error != nil {
+		c.IndentedJSON(200, gin.H{"data": "Author not found"})
+		return
+	}
+
+	var bookSerializer serializers.BookSerializer
+
+	if err := c.ShouldBindJSON(&bookSerializer); err != nil {
+		c.IndentedJSON(400, gin.H{"message": "Invalid Data"})
+		return
+	}
+
+	newBook := models.Book{Title: bookSerializer.Title, Description: bookSerializer.Description, AuthorID: authorId}
+	result := initializers.DB.Create(&newBook)
+
+	if result.Error != nil {
+		c.IndentedJSON(400, gin.H{"message": "Error creating new book."})
+		return
+	}
+
+	c.IndentedJSON(201, gin.H{"data": bookSerializer, "message": "Created new book successfully."})
+
 }
