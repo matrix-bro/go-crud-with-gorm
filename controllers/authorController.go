@@ -62,3 +62,13 @@ func CreateBook(c *gin.Context) {
 	c.IndentedJSON(201, gin.H{"data": bookSerializer, "message": "Created new book successfully."})
 
 }
+
+func GetAllAuthors(c *gin.Context) {
+	var authors []serializers.AuthorSerializer
+	result := initializers.DB.Model(&models.Author{}).Find(&authors)
+	if result.Error != nil {
+		c.IndentedJSON(400, gin.H{"message": "Error retrieving authors."})
+		return
+	}
+	c.IndentedJSON(201, gin.H{"data": authors, "message": "Author retrieved successfully."})
+}
