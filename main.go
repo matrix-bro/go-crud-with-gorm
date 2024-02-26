@@ -31,6 +31,7 @@ func main() {
 	r.POST("/book/:id", controllers.CreateBook)
 	r.GET("/authors", controllers.GetAllAuthors)
 	r.GET("/books", controllers.GetAllBooks)
+	r.GET("/author/:id", controllers.GetAuthorDetails)
 
 	r.Run("localhost:3000")
 }

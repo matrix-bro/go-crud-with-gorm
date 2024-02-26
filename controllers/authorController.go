@@ -90,3 +90,33 @@ func GetAllBooks(c *gin.Context) {
 	}
 	c.IndentedJSON(201, gin.H{"data": books, "message": "Books retrieved successfully."})
 }
+
+func GetAuthorDetails(c *gin.Context) {
+	author, err := GetAuthorByID(c.Param("id"))
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	var authorDetails serializers.AuthorDetailsSerializer
+	result := initializers.DB.Preload("Books").Find(&author).Error
+
+	if result != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": result.Error()})
+		return
+	}
+
+	authorDetails.FirstName = author.FirstName
+	authorDetails.LastName = author.LastName
+
+	for _, book := range author.Books {
+		book_serializer := serializers.BookSerializer{
+			Title:       book.Title,
+			Description: book.Description,
+		}
+
+		authorDetails.Books = append(authorDetails.Books, book_serializer)
+	}
+
+	c.IndentedJSON(201, gin.H{"data": authorDetails, "message": "Author details retrieved successfully."})
+}
