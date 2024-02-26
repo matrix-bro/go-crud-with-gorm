@@ -1,15 +1,14 @@
 package utils
 
 import (
-	"fmt"
 	"strconv"
 )
 
-func ConvertStringToUint(s string) (uint, string) {
+func ConvertStringToUint(s string) (uint, error) {
 	result, err := strconv.Atoi(s)
 	if err != nil {
-		fmt.Println(err.Error())
-		return 0, "Invalid data"
+		// fmt.Println(err.Error())
+		return 0, err
 	}
-	return uint(result), ""
+	return uint(result), nil
 }

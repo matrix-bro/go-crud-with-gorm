@@ -29,18 +29,26 @@ func CreateAuthor(c *gin.Context) {
 	c.IndentedJSON(201, gin.H{"data": authorSerializer, "message": "Created new author successfully."})
 }
 
-func CreateBook(c *gin.Context) {
-	authorId, err := utils.ConvertStringToUint(c.Param("id"))
+func GetAuthorByID(id string) (*models.Author, error) {
+	authorId, err := utils.ConvertStringToUint(id)
 
-	if err != "" {
-		c.IndentedJSON(200, gin.H{"error": err})
-		return
+	if err != nil {
+		return nil, err
+	}
+	var author models.Author
+	checkAuthor := initializers.DB.First(&author, authorId).Error
+
+	if checkAuthor != nil {
+		return nil, checkAuthor
 	}
 
-	checkAuthor := initializers.DB.First(&models.Author{}, authorId)
+	return &author, nil
+}
 
-	if checkAuthor.Error != nil {
-		c.IndentedJSON(200, gin.H{"data": "Author not found"})
+func CreateBook(c *gin.Context) {
+	author, err := GetAuthorByID(c.Param("id"))
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -51,7 +59,7 @@ func CreateBook(c *gin.Context) {
 		return
 	}
 
-	newBook := models.Book{Title: bookSerializer.Title, Description: bookSerializer.Description, AuthorID: authorId}
+	newBook := models.Book{Title: bookSerializer.Title, Description: bookSerializer.Description, AuthorID: author.ID}
 	result := initializers.DB.Create(&newBook)
 
 	if result.Error != nil {
