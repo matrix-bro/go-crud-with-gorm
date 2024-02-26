@@ -5,6 +5,7 @@ import (
 	"example/go-crud/models"
 	"example/go-crud/serializers"
 	"example/go-crud/utils"
+	"fmt"
 
 	"github.com/gin-gonic/gin"
 )
@@ -43,6 +44,22 @@ func GetAuthorByID(id string) (*models.Author, error) {
 	}
 
 	return &author, nil
+}
+
+func GetBookByID(id string) (*models.Book, error) {
+	bookId, err := utils.ConvertStringToUint(id)
+
+	if err != nil {
+		return nil, err
+	}
+	var book models.Book
+	checkBook := initializers.DB.First(&book, bookId).Error
+
+	if checkBook != nil {
+		return nil, checkBook
+	}
+
+	return &book, nil
 }
 
 func CreateBook(c *gin.Context) {
@@ -119,4 +136,28 @@ func GetAuthorDetails(c *gin.Context) {
 	}
 
 	c.IndentedJSON(201, gin.H{"data": authorDetails, "message": "Author details retrieved successfully."})
+}
+
+func GetBookDetails(c *gin.Context) {
+	book, err := GetBookByID(c.Param("id"))
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	fmt.Println(book)
+	var bookDetails serializers.BookDetailsSerializer
+	result := initializers.DB.Preload("Author").Find(&book).Error
+
+	if result != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": result.Error()})
+		return
+	}
+
+	bookDetails.Title = book.Title
+	bookDetails.Description = book.Description
+	bookDetails.Author.FirstName = book.Author.FirstName
+	bookDetails.Author.LastName = book.Author.LastName
+
+	c.IndentedJSON(201, gin.H{"data": bookDetails, "message": "Book details retrieved successfully."})
 }

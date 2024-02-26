@@ -32,6 +32,7 @@ func main() {
 	r.GET("/authors", controllers.GetAllAuthors)
 	r.GET("/books", controllers.GetAllBooks)
 	r.GET("/author/:id", controllers.GetAuthorDetails)
+	r.GET("/book/:id", controllers.GetBookDetails)
 
 	r.Run("localhost:3000")
 }

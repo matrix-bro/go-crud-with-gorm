@@ -15,3 +15,9 @@ type AuthorDetailsSerializer struct {
 	LastName  string           `json:"last_name"`
 	Books     []BookSerializer `json:"books"`
 }
+
+type BookDetailsSerializer struct {
+	Title       string           `json:"title"`
+	Description string           `json:"description"`
+	Author      AuthorSerializer `json:"author"`
+}
