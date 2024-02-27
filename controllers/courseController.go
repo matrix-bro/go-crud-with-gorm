@@ -27,3 +27,32 @@ func CreateCourse(c *gin.Context) {
 
 	c.IndentedJSON(201, gin.H{"data": courseSerializer, "message": "Created new course successfully."})
 }
+
+func CreateStudent(c *gin.Context) {
+	var studentSerializer serializers.StudentSerializer
+
+	if err := c.ShouldBindJSON(&studentSerializer); err != nil {
+		c.IndentedJSON(400, gin.H{"message": "Invalid Request Data"})
+		return
+	}
+
+	courseId := studentSerializer.CourseID
+	var course models.Course
+	if err := initializers.DB.First(&course, courseId).Error; err != nil {
+		c.IndentedJSON(400, gin.H{"message": "Course does not exists."})
+		return
+	}
+
+	student := models.Student{
+		FirstName: studentSerializer.FirstName,
+		LastName:  studentSerializer.LastName,
+		Courses:   []*models.Course{&course},
+	}
+
+	if err := initializers.DB.Create(&student).Error; err != nil {
+		c.IndentedJSON(400, gin.H{"message": "Error creating student"})
+		return
+	}
+
+	c.IndentedJSON(201, gin.H{"data": studentSerializer, "message": "Created new student successfully."})
+}

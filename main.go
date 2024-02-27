@@ -38,6 +38,7 @@ func main() {
 
 	// course & student
 	r.POST("/course", controllers.CreateCourse)
+	r.POST("/student", controllers.CreateStudent)
 
 	r.Run("localhost:3000")
 }
