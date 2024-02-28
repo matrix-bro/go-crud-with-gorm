@@ -9,3 +9,8 @@ type StudentSerializer struct {
 	FirstName string `json:"first_name" binding:"required,min=2"`
 	LastName  string `json:"last_name" binding:"required,min=2"`
 }
+
+type AllStudentsSerializer struct {
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+}

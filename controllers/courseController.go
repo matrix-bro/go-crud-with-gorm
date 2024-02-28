@@ -68,3 +68,15 @@ func AllCourses(c *gin.Context) {
 
 	c.IndentedJSON(201, gin.H{"data": courseSerializer, "message": "Courses retrieved successfully."})
 }
+
+func AllStudents(c *gin.Context) {
+	var studentSerializer []serializers.AllStudentsSerializer
+	result := initializers.DB.Model(&models.Student{}).Find(&studentSerializer).Error
+
+	if result != nil {
+		c.IndentedJSON(400, gin.H{"message": "Error retrieving courses"})
+		return
+	}
+
+	c.IndentedJSON(201, gin.H{"data": studentSerializer, "message": "Courses retrieved successfully."})
+}
