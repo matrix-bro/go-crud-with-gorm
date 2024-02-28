@@ -4,8 +4,6 @@ import (
 	"example/go-crud/initializers"
 	"example/go-crud/models"
 	"example/go-crud/serializers"
-	"example/go-crud/utils"
-	"fmt"
 
 	"github.com/gin-gonic/gin"
 )
@@ -30,40 +28,9 @@ func CreateAuthor(c *gin.Context) {
 	c.IndentedJSON(201, gin.H{"data": authorSerializer, "message": "Created new author successfully."})
 }
 
-func GetAuthorByID(id string) (*models.Author, error) {
-	authorId, err := utils.ConvertStringToUint(id)
-
-	if err != nil {
-		return nil, err
-	}
-	var author models.Author
-	checkAuthor := initializers.DB.First(&author, authorId).Error
-
-	if checkAuthor != nil {
-		return nil, checkAuthor
-	}
-
-	return &author, nil
-}
-
-func GetBookByID(id string) (*models.Book, error) {
-	bookId, err := utils.ConvertStringToUint(id)
-
-	if err != nil {
-		return nil, err
-	}
-	var book models.Book
-	checkBook := initializers.DB.First(&book, bookId).Error
-
-	if checkBook != nil {
-		return nil, checkBook
-	}
-
-	return &book, nil
-}
-
 func CreateBook(c *gin.Context) {
-	author, err := GetAuthorByID(c.Param("id"))
+	var author models.Author
+	err := CheckByID(c.Param("id"), &author)
 	if err != nil {
 		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
 		return
@@ -109,7 +76,8 @@ func GetAllBooks(c *gin.Context) {
 }
 
 func GetAuthorDetails(c *gin.Context) {
-	author, err := GetAuthorByID(c.Param("id"))
+	var author models.Author
+	err := CheckByID(c.Param("id"), &author)
 	if err != nil {
 		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
 		return
@@ -139,13 +107,13 @@ func GetAuthorDetails(c *gin.Context) {
 }
 
 func GetBookDetails(c *gin.Context) {
-	book, err := GetBookByID(c.Param("id"))
+	var book models.Book
+	err := CheckByID(c.Param("id"), &book)
 	if err != nil {
 		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
 		return
 	}
 
-	fmt.Println(book)
 	var bookDetails serializers.BookDetailsSerializer
 	result := initializers.DB.Preload("Author").Find(&book).Error
 
