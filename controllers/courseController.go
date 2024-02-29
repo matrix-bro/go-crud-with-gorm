@@ -110,3 +110,33 @@ func GetCourseDetails(c *gin.Context) {
 
 	c.IndentedJSON(201, gin.H{"data": courseDetails, "message": "Course details retrieved successfully."})
 }
+
+func GetStudentDetails(c *gin.Context) {
+	var student models.Student
+	err := CheckByID(c.Param("id"), &student)
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	var studentDetails serializers.StudentDetailsSerializer
+	result := initializers.DB.Preload("Courses").Find(&student).Error
+
+	if result != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": result.Error()})
+		return
+	}
+
+	studentDetails.FirstName = student.FirstName
+	studentDetails.LastName = student.LastName
+
+	for _, course := range student.Courses {
+		course_serializer := serializers.CourseSerializer{
+			Name: course.Name,
+		}
+
+		studentDetails.Courses = append(studentDetails.Courses, course_serializer)
+	}
+
+	c.IndentedJSON(201, gin.H{"data": studentDetails, "message": "Student details retrieved successfully."})
+}

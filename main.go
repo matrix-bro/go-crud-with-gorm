@@ -42,6 +42,7 @@ func main() {
 	r.GET("/courses", controllers.AllCourses)
 	r.GET("/students", controllers.AllStudents)
 	r.GET("/course/:id", controllers.GetCourseDetails)
+	r.GET("/student/:id", controllers.GetStudentDetails)
 
 	r.Run("localhost:3000")
 }
