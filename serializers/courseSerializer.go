@@ -14,3 +14,8 @@ type AllStudentsSerializer struct {
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
 }
+
+type CourseDetailsSerializer struct {
+	Name     string                  `json:"name"`
+	Students []AllStudentsSerializer `json:"students"`
+}

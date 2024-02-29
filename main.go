@@ -35,13 +35,13 @@ func main() {
 	r.GET("/books", controllers.GetAllBooks)
 	r.GET("/author/:id", controllers.GetAuthorDetails)
 	r.GET("/book/:id", controllers.GetBookDetails)
-	// r.GET("/test/:id", controllers.TestGetByID)
 
 	// course & student
 	r.POST("/course", controllers.CreateCourse)
 	r.POST("/student", controllers.CreateStudent)
 	r.GET("/courses", controllers.AllCourses)
 	r.GET("/students", controllers.AllStudents)
+	r.GET("/course/:id", controllers.GetCourseDetails)
 
 	r.Run("localhost:3000")
 }

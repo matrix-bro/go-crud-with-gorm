@@ -62,11 +62,11 @@ func AllCourses(c *gin.Context) {
 	result := initializers.DB.Model(&models.Course{}).Find(&courseSerializer).Error
 
 	if result != nil {
-		c.IndentedJSON(400, gin.H{"message": "Error retrieving courses"})
+		c.IndentedJSON(400, gin.H{"message": "Error retrieving all courses"})
 		return
 	}
 
-	c.IndentedJSON(201, gin.H{"data": courseSerializer, "message": "Courses retrieved successfully."})
+	c.IndentedJSON(201, gin.H{"data": courseSerializer, "message": "All Courses retrieved successfully."})
 }
 
 func AllStudents(c *gin.Context) {
@@ -74,9 +74,39 @@ func AllStudents(c *gin.Context) {
 	result := initializers.DB.Model(&models.Student{}).Find(&studentSerializer).Error
 
 	if result != nil {
-		c.IndentedJSON(400, gin.H{"message": "Error retrieving courses"})
+		c.IndentedJSON(400, gin.H{"message": "Error retrieving all students"})
 		return
 	}
 
-	c.IndentedJSON(201, gin.H{"data": studentSerializer, "message": "Courses retrieved successfully."})
+	c.IndentedJSON(201, gin.H{"data": studentSerializer, "message": "All Students retrieved successfully."})
+}
+
+func GetCourseDetails(c *gin.Context) {
+	var course models.Course
+	err := CheckByID(c.Param("id"), &course)
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	var courseDetails serializers.CourseDetailsSerializer
+	result := initializers.DB.Preload("Students").Find(&course).Error
+
+	if result != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": result.Error()})
+		return
+	}
+
+	courseDetails.Name = course.Name
+
+	for _, student := range course.Students {
+		student_serializer := serializers.AllStudentsSerializer{
+			FirstName: student.FirstName,
+			LastName:  student.LastName,
+		}
+
+		courseDetails.Students = append(courseDetails.Students, student_serializer)
+	}
+
+	c.IndentedJSON(201, gin.H{"data": courseDetails, "message": "Course details retrieved successfully."})
 }

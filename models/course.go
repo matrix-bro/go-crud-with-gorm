@@ -6,7 +6,7 @@ import "gorm.io/gorm"
 type Course struct {
 	gorm.Model
 	Name     string
-	Students []*Author `gorm:"many2many:course_student;"`
+	Students []*Student `gorm:"many2many:course_student;"`
 }
 
 type Student struct {
