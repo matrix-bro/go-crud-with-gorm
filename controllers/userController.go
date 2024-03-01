@@ -137,8 +137,17 @@ func UpdateUserDetails(c *gin.Context) {
 
 	user.FirstName = updateDetails.FirstName
 	user.LastName = updateDetails.LastName
-	user.Profile.Phone = updateDetails.Phone
-	user.Profile.Address = updateDetails.Address
+
+	// Check if the profile exists, create a new one if it doesn't
+	if user.Profile == nil {
+		user.Profile = &models.Profile{
+			Phone:   updateDetails.Phone,
+			Address: updateDetails.Address,
+		}
+	} else {
+		user.Profile.Phone = updateDetails.Phone
+		user.Profile.Address = updateDetails.Address
+	}
 
 	result := initializers.DB.Session(&gorm.Session{FullSaveAssociations: true}).Updates(&user).Error
 	if result != nil {
