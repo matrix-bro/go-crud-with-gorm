@@ -140,3 +140,44 @@ func GetStudentDetails(c *gin.Context) {
 
 	c.IndentedJSON(201, gin.H{"data": studentDetails, "message": "Student details retrieved successfully."})
 }
+
+func EnrollStudent(c *gin.Context) {
+	// check if the student is already enrolled in the same course
+	// if not then enroll
+	var enrollStudent serializers.EnrollStudentSerializer
+
+	if err := c.ShouldBindJSON(&enrollStudent); err != nil {
+		c.IndentedJSON(400, gin.H{"message": "Invalid Request Data"})
+		return
+	}
+
+	var course models.Course
+	err := initializers.DB.First(&course, enrollStudent.CourseID).Error
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	var student models.Student
+	err = initializers.DB.First(&student, enrollStudent.StudentID).Error
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	check_if_already_enrolled := initializers.DB.Model(&student).Where("course_id = ?", enrollStudent.CourseID).Association("Courses").Count()
+	if check_if_already_enrolled > 0 {
+		c.AbortWithStatusJSON(400, gin.H{"error": "Student is already enrolled in this course."})
+		return
+	}
+
+	result := initializers.DB.Model(&student).Association("Courses").Append(&course)
+
+	if result != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": result.Error()})
+		return
+	}
+
+	c.IndentedJSON(201, gin.H{"data": enrollStudent, "message": "Student enrolled successfully."})
+
+}

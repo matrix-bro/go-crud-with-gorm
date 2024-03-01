@@ -43,6 +43,7 @@ func main() {
 	r.GET("/students", controllers.AllStudents)
 	r.GET("/course/:id", controllers.GetCourseDetails)
 	r.GET("/student/:id", controllers.GetStudentDetails)
+	r.POST("/enroll", controllers.EnrollStudent)
 
 	r.Run("localhost:3000")
 }

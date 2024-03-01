@@ -25,3 +25,8 @@ type StudentDetailsSerializer struct {
 	LastName  string             `json:"last_name"`
 	Courses   []CourseSerializer `json:"courses"`
 }
+
+type EnrollStudentSerializer struct {
+	CourseID  uint `json:"course_id" binding:"required"`
+	StudentID uint `json:"student_id" binding:"required"`
+}
