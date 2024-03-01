@@ -27,6 +27,7 @@ func main() {
 	r.GET("/user/all", controllers.AllUsers)
 	r.GET("/user/profile", controllers.UserProfile)
 	r.GET("/user/:id", controllers.GetUserDetails)
+	r.PUT("/user/:id", controllers.UpdateUserDetails)
 
 	// author & book
 	r.POST("/author", controllers.CreateAuthor)

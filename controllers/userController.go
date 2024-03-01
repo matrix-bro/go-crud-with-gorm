@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func CreateUser(c *gin.Context) {
@@ -110,4 +111,41 @@ func GetUserDetails(c *gin.Context) {
 		Where("users.id = ?", userId).Scan(&userProfile)
 
 	c.IndentedJSON(200, gin.H{"data": userProfile})
+}
+
+func UpdateUserDetails(c *gin.Context) {
+	var updateDetails serializers.UpdateUserDetailsSerializer
+
+	if err := c.ShouldBindJSON(&updateDetails); err != nil {
+		c.IndentedJSON(400, gin.H{"message": "Invalid Request Data"})
+		return
+	}
+
+	var user models.User
+	err := CheckByID(c.Param("id"), &user)
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Getting user with profile
+	err = initializers.DB.Preload("Profile").First(&user, c.Param("id")).Error
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	user.FirstName = updateDetails.FirstName
+	user.LastName = updateDetails.LastName
+	user.Profile.Phone = updateDetails.Phone
+	user.Profile.Address = updateDetails.Address
+
+	result := initializers.DB.Session(&gorm.Session{FullSaveAssociations: true}).Updates(&user).Error
+	if result != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": result.Error()})
+		return
+	}
+
+	c.IndentedJSON(201, gin.H{"data": updateDetails, "message": "User details updated successfully."})
+
 }
