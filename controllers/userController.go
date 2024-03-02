@@ -61,11 +61,11 @@ func AllUsers(c *gin.Context) {
 	result := initializers.DB.Find(&users).Scan(&response)
 
 	if result.Error != nil {
-		c.Status(400)
+		c.IndentedJSON(400, gin.H{"message": "Error retrieving users"})
 		return
 	}
 
-	c.IndentedJSON(200, gin.H{"data": response})
+	c.IndentedJSON(200, gin.H{"data": response, "message": "All Users retrieved successfully."})
 }
 
 func UserProfile(c *gin.Context) {
@@ -76,30 +76,34 @@ func UserProfile(c *gin.Context) {
 		Scan(&userprofiles)
 
 	if result.Error != nil {
-		c.Status(400)
+		c.IndentedJSON(400, gin.H{"message": "Error retrieving user profiles"})
 		return
 	}
 
-	c.IndentedJSON(200, gin.H{"data": userprofiles})
+	c.IndentedJSON(200, gin.H{"data": userprofiles, "message": "All User profiles retrieved successfully."})
 }
 
 func GetUserDetails(c *gin.Context) {
-	userId := c.Param("id")
-	var userProfile serializers.UserProfileResponse
-
-	checkUser := initializers.DB.First(&models.User{}, userId)
-
-	if checkUser.Error != nil {
-		c.IndentedJSON(200, gin.H{"data": "User not found"})
+	var user models.User
+	err := CheckByID(c.Param("id"), &user)
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
 		return
 	}
 
-	initializers.DB.Model(&models.User{}).
+	var userProfile serializers.UserProfileResponse
+
+	result := initializers.DB.Model(&models.User{}).
 		Joins("LEFT JOIN profiles on users.id = profiles.user_id").
 		Select("first_name, last_name, phone, address").
-		Where("users.id = ?", userId).Scan(&userProfile)
+		Where("users.id = ?", user.ID).Scan(&userProfile).Error
 
-	c.IndentedJSON(200, gin.H{"data": userProfile})
+	if result != nil {
+		c.IndentedJSON(400, gin.H{"message": "Error retrieving user details"})
+		return
+	}
+
+	c.IndentedJSON(200, gin.H{"data": userProfile, "message": "User details retrieved successfully."})
 }
 
 func UpdateUserDetails(c *gin.Context) {
