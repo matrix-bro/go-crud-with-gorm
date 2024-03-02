@@ -4,56 +4,45 @@ import (
 	"example/go-crud/initializers"
 	"example/go-crud/models"
 	"example/go-crud/serializers"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
 func CreateUser(c *gin.Context) {
-	var newUser models.User
+	var userSerializer serializers.UserSerializer
 
-	if err := c.ShouldBindJSON(&newUser); err != nil {
+	if err := c.ShouldBindJSON(&userSerializer); err != nil {
+		c.IndentedJSON(400, gin.H{"error": "Invalid Request Data"})
+		return
+	}
+
+	user := models.User{FirstName: userSerializer.FirstName, LastName: userSerializer.LastName}
+	result := initializers.DB.Create(&user)
+
+	if result.Error != nil {
+		c.IndentedJSON(400, gin.H{"error": "Error creating new user"})
+		return
+	}
+
+	c.IndentedJSON(201, gin.H{"data": userSerializer, "message": "User created successfully."})
+}
+
+func CreateProfile(c *gin.Context) {
+	var user models.User
+	err := CheckByID(c.Param("id"), &user)
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	var profileSerializer serializers.ProfileSerializer
+	if err := c.ShouldBindJSON(&profileSerializer); err != nil {
 		c.IndentedJSON(400, gin.H{"message": "Invalid Data"})
 		return
 	}
 
-	// save the user
-	result := initializers.DB.Create(&newUser)
-
-	if result.Error != nil {
-		c.Status(400)
-		return
-	}
-
-	c.IndentedJSON(201, gin.H{"user": newUser})
-}
-
-func CreateProfile(c *gin.Context) {
-	userID, err := strconv.Atoi(c.Param("id"))
-
-	if err != nil {
-		c.IndentedJSON(400, gin.H{"message": "Invalid User ID"})
-		return
-	}
-
-	var user models.User
-	result := initializers.DB.First(&user, userID)
-
-	if result.Error != nil {
-		c.IndentedJSON(400, gin.H{"message": "User not found."})
-		return
-	}
-
-	req := new(models.Profile)
-	err = c.ShouldBindJSON(&req)
-
-	if err != nil {
-		c.IndentedJSON(400, gin.H{"message": "Invalid Profile Data"})
-		return
-	}
-
-	user_profile := models.Profile{Phone: req.Phone, Address: req.Address, UserID: uint(userID)}
+	user_profile := models.Profile{Phone: profileSerializer.Phone, Address: profileSerializer.Address, UserID: user.ID}
 
 	profile := initializers.DB.Create(&user_profile)
 
@@ -62,12 +51,12 @@ func CreateProfile(c *gin.Context) {
 		return
 	}
 
-	c.IndentedJSON(201, gin.H{"message": user_profile})
+	c.IndentedJSON(201, gin.H{"data": profileSerializer, "message": "User Profile created successfully."})
 }
 
 func AllUsers(c *gin.Context) {
 	var users []models.User
-	var response []serializers.UserResponse
+	var response []serializers.UserSerializer
 
 	result := initializers.DB.Find(&users).Scan(&response)
 

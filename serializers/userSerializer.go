@@ -1,8 +1,13 @@
 package serializers
 
-type UserResponse struct {
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
+type UserSerializer struct {
+	FirstName string `json:"first_name" binding:"required"`
+	LastName  string `json:"last_name" binding:"required"`
+}
+
+type ProfileSerializer struct {
+	Phone   string `json:"phone" binding:"required"`
+	Address string `json:"address" binding:"required"`
 }
 
 type UserProfileResponse struct {
