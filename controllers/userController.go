@@ -26,7 +26,7 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	c.IndentedJSON(200, gin.H{"user": newUser})
+	c.IndentedJSON(201, gin.H{"user": newUser})
 }
 
 func CreateProfile(c *gin.Context) {
@@ -62,7 +62,7 @@ func CreateProfile(c *gin.Context) {
 		return
 	}
 
-	c.IndentedJSON(200, gin.H{"message": user_profile})
+	c.IndentedJSON(201, gin.H{"message": user_profile})
 }
 
 func AllUsers(c *gin.Context) {
@@ -155,6 +155,23 @@ func UpdateUserDetails(c *gin.Context) {
 		return
 	}
 
-	c.IndentedJSON(201, gin.H{"data": updateDetails, "message": "User details updated successfully."})
+	c.IndentedJSON(200, gin.H{"data": updateDetails, "message": "User details updated successfully."})
 
+}
+
+func DeleteUser(c *gin.Context) {
+	var user models.User
+	err := CheckByID(c.Param("id"), &user)
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = initializers.DB.Select("Profile").Delete(&user).Error
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(200, gin.H{"message": "User deleted successfully."})
 }

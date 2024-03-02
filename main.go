@@ -28,6 +28,7 @@ func main() {
 	r.GET("/user/profile", controllers.UserProfile)
 	r.GET("/user/:id", controllers.GetUserDetails)
 	r.PUT("/user/:id", controllers.UpdateUserDetails)
+	r.DELETE("/user/:id", controllers.DeleteUser)
 
 	// author & book
 	r.POST("/author", controllers.CreateAuthor)
