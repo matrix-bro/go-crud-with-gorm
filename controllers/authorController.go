@@ -156,3 +156,21 @@ func UpdateAuthorDetails(c *gin.Context) {
 	c.IndentedJSON(200, gin.H{"data": authorSerializer, "message": "Author details updated successfully."})
 
 }
+
+func DeleteAuthor(c *gin.Context) {
+	var author models.Author
+	err := CheckByID(c.Param("id"), &author)
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Soft delete Author and related Books
+	err = initializers.DB.Select("Books").Delete(&author).Error
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(200, gin.H{"message": "Author deleted successfully."})
+}
