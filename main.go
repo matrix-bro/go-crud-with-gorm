@@ -39,6 +39,7 @@ func main() {
 	r.GET("/book/:id", controllers.GetBookDetails)
 	r.PUT("/author/:id", controllers.UpdateAuthorDetails)
 	r.DELETE("/author/:id", controllers.DeleteAuthor)
+	r.PUT("/book/:id", controllers.UpdateBookDetails)
 
 	// course & student
 	r.POST("/course", controllers.CreateCourse)

@@ -174,3 +174,29 @@ func DeleteAuthor(c *gin.Context) {
 
 	c.IndentedJSON(200, gin.H{"message": "Author deleted successfully."})
 }
+
+func UpdateBookDetails(c *gin.Context) {
+	var book models.Book
+	err := CheckByID(c.Param("id"), &book)
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	var bookSerializer serializers.BookSerializer
+	if err := c.ShouldBindJSON(&bookSerializer); err != nil {
+		c.IndentedJSON(400, gin.H{"message": "Invalid Data"})
+		return
+	}
+
+	book.Title = bookSerializer.Title
+	book.Description = bookSerializer.Description
+
+	err = initializers.DB.Save(&book).Error
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(200, gin.H{"data": bookSerializer, "message": "Book details updated successfully."})
+}
