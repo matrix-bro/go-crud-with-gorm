@@ -129,3 +129,30 @@ func GetBookDetails(c *gin.Context) {
 
 	c.IndentedJSON(201, gin.H{"data": bookDetails, "message": "Book details retrieved successfully."})
 }
+
+func UpdateAuthorDetails(c *gin.Context) {
+	var author models.Author
+	err := CheckByID(c.Param("id"), &author)
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	var authorSerializer serializers.AuthorSerializer
+	if err := c.ShouldBindJSON(&authorSerializer); err != nil {
+		c.IndentedJSON(400, gin.H{"message": "Invalid Data"})
+		return
+	}
+
+	author.FirstName = authorSerializer.FirstName
+	author.LastName = authorSerializer.LastName
+
+	err = initializers.DB.Save(&author).Error
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(200, gin.H{"data": authorSerializer, "message": "Author details updated successfully."})
+
+}
