@@ -50,6 +50,7 @@ func main() {
 	r.GET("/course/:id", controllers.GetCourseDetails)
 	r.GET("/student/:id", controllers.GetStudentDetails)
 	r.POST("/enroll", controllers.EnrollStudent)
+	r.PUT("/course/:id", controllers.UpdateCourseDetails)
 
 	r.Run("localhost:3000")
 }

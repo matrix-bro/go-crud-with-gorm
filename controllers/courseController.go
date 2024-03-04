@@ -181,3 +181,28 @@ func EnrollStudent(c *gin.Context) {
 	c.IndentedJSON(201, gin.H{"data": enrollStudent, "message": "Student enrolled successfully."})
 
 }
+
+func UpdateCourseDetails(c *gin.Context) {
+	var course models.Course
+	err := CheckByID(c.Param("id"), &course)
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	var courseSerializer serializers.CourseSerializer
+	if err := c.ShouldBindJSON(&courseSerializer); err != nil {
+		c.IndentedJSON(400, gin.H{"message": "Invalid Data"})
+		return
+	}
+
+	course.Name = courseSerializer.Name
+
+	err = initializers.DB.Save(&course).Error
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(200, gin.H{"data": courseSerializer, "message": "Course details updated successfully."})
+}
