@@ -200,3 +200,20 @@ func UpdateBookDetails(c *gin.Context) {
 
 	c.IndentedJSON(200, gin.H{"data": bookSerializer, "message": "Book details updated successfully."})
 }
+
+func DeleteBook(c *gin.Context) {
+	var book models.Book
+	err := CheckByID(c.Param("id"), &book)
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = initializers.DB.Delete(&book).Error
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(200, gin.H{"message": "Book deleted successfully."})
+}
