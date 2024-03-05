@@ -249,3 +249,20 @@ func UpdateStudentDetails(c *gin.Context) {
 
 	c.IndentedJSON(200, gin.H{"data": studentSerializer, "message": "Student details updated successfully."})
 }
+
+func DeleteStudent(c *gin.Context) {
+	var student models.Student
+	err := CheckByID(c.Param("id"), &student)
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = initializers.DB.Select("Courses").Delete(&student).Error
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(200, gin.H{"message": "Student deleted successfully."})
+}
