@@ -223,3 +223,29 @@ func DeleteCourse(c *gin.Context) {
 
 	c.IndentedJSON(200, gin.H{"message": "Course deleted successfully."})
 }
+
+func UpdateStudentDetails(c *gin.Context) {
+	var student models.Student
+	err := CheckByID(c.Param("id"), &student)
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	var studentSerializer serializers.AllStudentsSerializer
+	if err := c.ShouldBindJSON(&studentSerializer); err != nil {
+		c.IndentedJSON(400, gin.H{"message": "Invalid Data"})
+		return
+	}
+
+	student.FirstName = studentSerializer.FirstName
+	student.LastName = studentSerializer.LastName
+
+	err = initializers.DB.Save(&student).Error
+	if err != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(200, gin.H{"data": studentSerializer, "message": "Student details updated successfully."})
+}

@@ -52,6 +52,7 @@ func main() {
 	r.POST("/enroll", controllers.EnrollStudent)
 	r.PUT("/course/:id", controllers.UpdateCourseDetails)
 	r.DELETE("/course/:id", controllers.DeleteCourse)
+	r.PUT("/student/:id", controllers.UpdateStudentDetails)
 
 	r.Run("localhost:3000")
 }
